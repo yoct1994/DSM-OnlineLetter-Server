@@ -26,28 +26,30 @@ export class UserService {
     private configService: ConfigService,
   ) {}
 
-  uploadFileURL = `http://${this.configService.get('image.url')}/user/image`;
-
   async signUp(signUpRequest: SignUpRequest, file: Express.Multer.File) {
     const user = await this.userRepository.findOne({ id: signUpRequest.id });
     if (!file) {
       return new BadFileRequestException();
     }
 
-    this.uploadFileURL + `/${file.filename}`;
     console.log(user);
     if (user) {
       console.error('실패');
       throw new AlreadySignUpException();
     } else {
-      this.userRepository.save({
-        id: signUpRequest.id,
-        password: hash(signUpRequest.password),
-        name: signUpRequest.username,
-        userImage: this.uploadFileURL + `/${file.filename}`,
-        longitude: signUpRequest.area.longitude,
-        latitude: signUpRequest.area.latitude,
-      });
+      await this.userRepository
+        .save({
+          id: signUpRequest.id,
+          password: hash(signUpRequest.password),
+          name: signUpRequest.username,
+          userImage: `http://localhost:8080/${file.filename}`,
+          longitude: signUpRequest.longitude,
+          latitude: signUpRequest.latitude,
+        })
+        .catch((err) => {
+          console.log(err);
+          throw new BadFileRequestException();
+        });
     }
   }
 

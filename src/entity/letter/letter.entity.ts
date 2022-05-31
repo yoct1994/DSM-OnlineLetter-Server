@@ -1,11 +1,11 @@
 import {
   Column,
   Entity,
-  JoinColumn,
-  OneToOne,
+  JoinTable,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../user/user.entity';
+import { LetterUser } from '../letter_user/letter-user.entity';
 
 @Entity('letter')
 export class Letter {
@@ -19,19 +19,13 @@ export class Letter {
 
   @Column({
     nullable: false,
-  })
-  @OneToOne(() => User)
-  @JoinColumn()
-  to: User;
-
-  @OneToOne(() => User)
-  @JoinColumn()
-  from: User;
-
-  @Column({
-    nullable: false,
+    length: 1000,
   })
   chatList: string;
+
+  @OneToMany((type) => LetterUser, (users) => users.letterId, { cascade: true })
+  @JoinTable({ name: 'letterUsers' })
+  letterUsers: LetterUser[];
 
   @Column({
     nullable: false,
@@ -41,5 +35,5 @@ export class Letter {
   @Column({
     nullable: false,
   })
-  writeAt: Date;
+  writeAt: number;
 }

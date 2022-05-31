@@ -8,7 +8,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import JwtAuthGuard from 'src/auth/jwt/jwt-auth.guard';
 import { Token } from 'src/auth/jwt/token.decorator';
 import { VerifyToken, WriteLetterRequest } from 'src/data/Data';
@@ -19,8 +19,8 @@ import { LetterService } from './letter.service';
 export class LetterController {
   constructor(private readonly letterService: LetterService) {}
 
-  @Post()
-  @UseInterceptors(FileInterceptor('images', MulterConfig))
+  @Post('/write')
+  @UseInterceptors(FilesInterceptor('images', null, MulterConfig))
   @UseGuards(JwtAuthGuard)
   writeLetter(
     @UploadedFiles() images: Express.Multer.File[],
@@ -34,11 +34,27 @@ export class LetterController {
     );
   }
 
+  @Get('detail/:letterSeq')
+  @UseGuards(JwtAuthGuard)
+  getLetter(
+    @Param('letterSeq') letterSeq: number,
+    @Token() verifyToken: VerifyToken,
+  ) {
+    return this.letterService.getLetter(letterSeq, verifyToken);
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
-  getMyLetters() {}
+  getMyLetters(@Token() verifyToken: VerifyToken) {
+    return this.letterService.getMyLetters(verifyToken);
+  }
 
-  @Get('/:userSeq')
+  @Get('someone/:userSeq')
   @UseGuards(JwtAuthGuard)
-  getSomeOneLetters(@Param('userSeq') userSeq: number) {}
+  getSomeOneLetters(
+    @Param('userSeq') userSeq: number,
+    @Token() verifyToken: VerifyToken,
+  ) {
+    return this.letterService.getSomeOneLetters(verifyToken, userSeq);
+  }
 }

@@ -13,6 +13,10 @@ export class UserResponse {
   latitude: number;
 }
 
+export class LetterResponse {
+  chatList: string;
+}
+
 export class VerifyToken {
   userSeq: number;
 }
@@ -36,14 +40,16 @@ export class SignUpRequest {
   username: string;
 
   @IsNotEmpty()
-  area: Area;
+  longitude: number;
+
+  @IsNotEmpty()
+  latitude: number;
 }
 
 export class WriteLetterRequest {
   @IsNotEmpty()
   title: string;
 
-  @IsNotEmpty()
   chatList: string;
 
   @IsNotEmpty()
@@ -65,6 +71,8 @@ export type Letter = {
   id: number;
   from: string;
   to: string;
+  fromSeq: number;
+  toSeq: number;
   isRead: boolean;
 };
 

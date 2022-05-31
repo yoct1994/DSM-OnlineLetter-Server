@@ -7,6 +7,10 @@ import configuration from './config/configuration';
 import { User } from './entity/user/user.entity';
 import { UserModule } from './user/user.module';
 import * as redisStore from 'cache-manager-redis-store';
+import { LetterModule } from './letter/letter.module';
+import { Letter } from './entity/letter/letter.entity';
+import { LetterImage } from './entity/image/letter/image.letter.entity';
+import { LetterUser } from './entity/letter_user/letter-user.entity';
 
 @Module({
   imports: [
@@ -25,7 +29,7 @@ import * as redisStore from 'cache-manager-redis-store';
         port: configService.get('database.port'),
         database: configService.get('database.name'),
         synchronize: true,
-        entities: [User],
+        entities: [User, Letter, LetterImage, LetterUser],
       }),
     }),
     CacheModule.registerAsync({
@@ -41,6 +45,7 @@ import * as redisStore from 'cache-manager-redis-store';
     }),
     UserModule,
     AuthModule,
+    LetterModule,
   ],
   controllers: [],
   providers: [],
