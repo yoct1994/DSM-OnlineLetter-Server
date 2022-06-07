@@ -34,6 +34,13 @@ export class Letter {
 
   @Column({
     nullable: false,
+    type: 'bigint',
   })
   writeAt: number;
+
+  @Column({
+    nullable: false,
+    type: 'bigint',
+  })
+  sendAt: number;
 }

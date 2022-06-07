@@ -7,6 +7,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalFilters(new HttpExceptionHandler());
-  await app.listen(8080);
+  await app.listen(7006);
 }
 bootstrap();

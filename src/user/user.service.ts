@@ -42,7 +42,7 @@ export class UserService {
           id: signUpRequest.id,
           password: hash(signUpRequest.password),
           name: signUpRequest.username,
-          userImage: `http://localhost:8080/${file.filename}`,
+          userImage: `http://localhost:8080/user/image/${file.filename}`,
           longitude: signUpRequest.longitude,
           latitude: signUpRequest.latitude,
         })

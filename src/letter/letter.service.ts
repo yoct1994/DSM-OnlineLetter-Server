@@ -69,6 +69,16 @@ export class LetterService {
     }
     console.log(Date.now());
 
+    var dist: number = (dist = this.getDistance(
+      user.latitude,
+      user.longitude,
+      to.latitude,
+      to.longitude,
+    ));
+    var send = Math.ceil(dist / 10);
+
+    console.log(Date.now() + send);
+
     const users = (await this.letterUserRepository.save([
       {
         userSeq: user,
@@ -80,13 +90,16 @@ export class LetterService {
       },
     ])) as LetterUser[];
 
+    console.log(new Date(Date.now() + send));
+
     const letter = await this.letterRepository
       .save({
         title: writeLetterRequest.title,
         chatList: chatJson,
         isRead: false,
         letterUsers: users,
-        writeAt: Date.now() / 1000,
+        writeAt: Date.now(),
+        sendAt: Date.now() + send,
       })
       .catch((err) => {
         console.log(err);
@@ -104,6 +117,27 @@ export class LetterService {
           throw new ServerErrorException();
         });
     });
+  }
+
+  getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+    if (lat1 == lat2 && lon1 == lon2) return 0;
+
+    var radLat1 = (Math.PI * lat1) / 180;
+    var radLat2 = (Math.PI * lat2) / 180;
+    var theta = lon1 - lon2;
+    var radTheta = (Math.PI * theta) / 180;
+    var dist: number =
+      Math.sin(radLat1) * Math.sin(radLat2) +
+      Math.cos(radLat1) * Math.cos(radLat2) * Math.cos(radTheta);
+    if (dist > 1) dist = 1;
+
+    dist = Math.acos(dist);
+    dist = (dist * 180) / Math.PI;
+    dist = dist * 60 * 1.1515 * 1.609344 * 1000;
+    if (dist < 100) dist = Math.round(dist / 10) * 10;
+    else dist = Math.round(dist / 100) * 100;
+
+    return dist;
   }
 
   async getLetter(
@@ -173,8 +207,9 @@ export class LetterService {
       .leftJoin('letters.letterUsers', 'u')
       .leftJoinAndSelect('letters.letterUsers', 'users')
       .leftJoinAndSelect('users.userSeq', 'userSeq')
-      .where('u.userSeq.userSeq = :userSeq', {
+      .where('u.userSeq.userSeq = :userSeq and letters.sendAt <= :now', {
         userSeq: user.userSeq,
+        now: Date.now(),
       })
       .getMany();
 
